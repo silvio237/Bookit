@@ -11,46 +11,45 @@ datasource db {
 }
 
 model User {
-  id             String      @id @default(cuid())
-  famillyName    String?  
-  givenName      String?
-  email          String      @unique  
-  companyId      String?
-  company        Company?    @relation("CompanyEmployees" ,fields: [companyId], references: [id])         
-  createdCompanies Company[] @relation("CompanyCreators")
+  id               String        @id @default(cuid())
+  famillyName      String?
+  givenName        String?
+  email            String        @unique
+  companyId        String?
+  company          Company?      @relation("CompanyEmployees", fields: [companyId], references: [id])
+  createdCompanies Company[]     @relation("CompanyCreators")
   reservations     Reservation[]
-
 }
 
 model Company {
-   id             String  @id @default(cuid())
-   name           String  @unique
-   employees      User[]  @relation("CompanyEmployees")
-   createdById    String
-   rooms          Room[]
-   createdBy      User    @relation("CompanyCreators" , fields: [createdById] , references: [id])
+  id          String @id @default(cuid())
+  name        String @unique
+  employees   User[] @relation("CompanyEmployees")
+  createdById String
+  rooms       Room[]
+  createdBy   User   @relation("CompanyCreators", fields: [createdById], references: [id])
 }
 
 model Room {
-   id             String  @id @default(cuid())
-   name           String  
-   capacity       Int
-   description    String?
-   imgUrl         String?
-   companyId      String
-   company        Company    @relation(fields: [companyId], references: [id])  
-  reservations     Reservation[]
+  id           String        @id @default(cuid())
+  name         String
+  capacity     Int
+  description  String?
+  imgUrl       String?
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id])
+  reservations Reservation[]
 }
 
 model Reservation {
-   id               String  @id @default(cuid())
-   userId           String
-   user             User    @relation(fields: [userId], references: [id]) 
-   roomId           String
-   room             Room    @relation(fields: [roomId], references: [id]) 
-   reservationDate  String  
-   startTime        String
-   endTime          String
+  id              String @id @default(cuid())
+  userId          String
+  user            User   @relation(fields: [userId], references: [id])
+  roomId          String
+  room            Room   @relation(fields: [roomId], references: [id])
+  reservationDate String
+  startTime       String
+  endTime         String
 
-   @@unique([roomId , reservationDate , startTime])
+  @@unique([roomId, reservationDate, startTime])
 }
