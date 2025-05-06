@@ -24,7 +24,7 @@ interface RoomData {
   existingReservations: Reservation[]
 }
 
-const page = ({ params }: { params: { roomId: string } }) => {
+const Page = ({ params }: { params: { roomId: string } }) => {
   const { user } = useKindeBrowserClient();
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [roomData, setRoomData] = useState<RoomData | null>(null)
@@ -352,4 +352,4 @@ const page = ({ params }: { params: { roomId: string } }) => {
   )
 }
 
-export default page
+export default Page
