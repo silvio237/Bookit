@@ -8,13 +8,27 @@ interface ReservationRequest {
     timeSlots: string[];
 }
 
+// Type personnalisé pour retirer userId de la réponse
+type SafeReservation = {
+    id: string;
+    roomId: string;
+    reservationDate: string;
+    startTime: string;
+    endTime: string;
+    room: {
+        id: string;
+        name: string;
+        capacity: number;
+    };
+};
+
 export async function POST(request: Request) {
     try {
         const body = await request.text();
         const { email, roomId, reservationDate, timeSlots }: ReservationRequest = JSON.parse(body);
 
-        if (!email || !roomId || !reservationDate || !timeSlots || !Array.isArray(timeSlots)) {
-            return NextResponse.json({ message: 'Tous les champs sont requis et timeSlots doit être un tableau.' }, { status: 400 });
+        if (!email || !roomId || !reservationDate || !Array.isArray(timeSlots)) {
+            return NextResponse.json({ message: 'Champs manquants ou invalides.' }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({
@@ -26,9 +40,9 @@ export async function POST(request: Request) {
         }
 
         const reservations = await Promise.all(
-            timeSlots.map(async (slot) => {
+            timeSlots.map((slot) => {
                 if (!slot.includes(' - ')) {
-                    throw new Error(`Format de créneau invalide : ${slot}`);
+                    throw new Error(`Créneau invalide : ${slot}`);
                 }
                 const [startTime, endTime] = slot.split(' - ');
                 return prisma.reservation.create({
@@ -45,8 +59,8 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ reservations }, { status: 201 });
     } catch (error) {
-        console.error('Error in API:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('POST /reservations error:', error);
+        return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
     }
 }
 
@@ -56,7 +70,7 @@ export async function GET(request: Request) {
         const email = searchParams.get('email');
 
         if (!email) {
-            return NextResponse.json({ message: 'Email manquant' }, { status: 400 });
+            return NextResponse.json({ message: 'Email requis' }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({
@@ -74,17 +88,23 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: 'Utilisateur non trouvé' }, { status: 404 });
         }
 
-        // ⚠️ Version alternative sans utiliser 'userId' dans la déstructuration
-        const reservationWithoutUserId = user.reservations.map((reservation) => {
-            const copy = { ...reservation } as { [key: string]: any };
-            delete copy.userId;
-            return copy;
-        });
+        const formatted: SafeReservation[] = user.reservations.map((r) => ({
+            id: r.id,
+            roomId: r.roomId,
+            reservationDate: r.reservationDate,
+            startTime: r.startTime,
+            endTime: r.endTime,
+            room: {
+                id: r.room.id,
+                name: r.room.name,
+                capacity: r.room.capacity,
+            },
+        }));
 
-        return NextResponse.json({ reservationWithoutUserId }, { status: 200 });
+        return NextResponse.json({ reservations: formatted }, { status: 200 });
     } catch (error) {
-        console.error('Error in API:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('GET /reservations error:', error);
+        return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
     }
 }
 
@@ -93,16 +113,16 @@ export async function DELETE(request: Request) {
         const { id } = await request.json();
 
         if (!id) {
-            return NextResponse.json({ message: 'L\'ID de la réservation est requis' }, { status: 400 });
+            return NextResponse.json({ message: 'ID de réservation requis' }, { status: 400 });
         }
 
-        const deletedReservation = await prisma.reservation.delete({
+        const deleted = await prisma.reservation.delete({
             where: { id },
         });
 
-        return NextResponse.json({ message: 'Réservation supprimée avec succès', deletedReservation });
+        return NextResponse.json({ message: 'Réservation supprimée', reservation: deleted });
     } catch (error) {
-        console.error('Error in API:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('DELETE /reservations error:', error);
+        return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
     }
 }

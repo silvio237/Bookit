@@ -1,17 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-      domains: ['files.edgestore.dev'],
-    },
-    typescript: {
-      // ⚠️ Ignore les erreurs TypeScript au build (à utiliser avec prudence)
-      ignoreBuildErrors: true,
-    },
-    eslint: {
-      // ⚠️ Ignore les erreurs ESLint au build
-      ignoreDuringBuilds: true,
-    },
-  }
-  
-  export default nextConfig
-  
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https', // Utilise 'https' ou 'http' selon ton cas
+        hostname: 'files.edgestore.dev', // Nom du domaine
+        port: '', // Laisse vide si aucun port spécifique
+        pathname: '/**', // Autorise tous les chemins sous ce domaine
+      },
+    ],
+  },
+};
+
+export default nextConfig;
