@@ -11,7 +11,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",  // Change "bundler" à "node"
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -26,14 +26,14 @@
         "./*"
       ]
     },
-    "target": "ES2017"
+    "target": "ESNext"  // Changer "ES2017" en "ESNext"
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "middlewared"
+    ".next/types/**/*.ts"
+    // Si "middlewared" est un dossier, garde-le sinon enlève cette ligne
   ],
   "exclude": [
     "node_modules"

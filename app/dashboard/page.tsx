@@ -1,37 +1,30 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import Wrapper from '../components/Wrapper';
 import Image from 'next/image';
-import { SquareArrowOutUpRight, Users } from 'lucide-react';
+import { Clock, SquareArrowOutUpRight, Users } from 'lucide-react';
 import Link from 'next/link';
-
-// Définition du type Room pour éviter d'utiliser any[]
-interface Room {
-  id: string;
-  name: string;
-  imgUrl: string;
-  capacity: number;
-  description: string;
-}
 
 const Page = () => {
   const { user } = useKindeBrowserClient();
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [rooms, setRooms] = useState<Room[]>([]); // Utilisation du type Room pour les salles
-  const [companyName, setCompanyName] = useState<string>('');
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [companyName, setCompanyName] = useState('');
 
   const cleanupExpiredReservations = async () => {
     try {
-      await fetch('/api/cleanupReservations', { method: 'DELETE' });
+      await fetch('/api/cleanupReservations', {
+        method: 'DELETE'
+      });
     } catch (error) {
-      console.error('Erreur lors du nettoyage des réservations expirées:', error);
+      console.error(error);
     }
   };
 
-  // Étape 1 - Récupérer l'entreprise de l'utilisateur dès qu'il est disponible
+  // Étape 1 - Dès que l'utilisateur est dispo, on récupère son entreprise
   useEffect(() => {
     const fetchCompanyId = async () => {
       if (user) {
@@ -41,9 +34,9 @@ const Page = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               email: user.email,
-              familyName: user.family_name, // Correction de l'orthographe de 'familyName'
-              givenName: user.given_name,
-            }),
+              famillyName: user.family_name,
+              givenName: user.given_name
+            })
           });
 
           const data = await response.json();
@@ -60,7 +53,7 @@ const Page = () => {
     fetchCompanyId();
   }, [user]);
 
-  // Étape 2 - Récupérer les salles dès que l'on a le companyId
+  // Étape 2 - Dès qu'on a le companyId, on récupère les salles
   useEffect(() => {
     const fetchRooms = async () => {
       if (companyId) {
@@ -105,7 +98,7 @@ const Page = () => {
     <Wrapper>
       <div>
         {companyName && (
-          <div className="badge badge-secondary badge-outline mb-4">
+          <div className="badge badge-secondary badge-outline">
             {companyName}
           </div>
         )}
@@ -114,14 +107,14 @@ const Page = () => {
 
         {!companyId ? (
           <div>
-            Vous n&apos;êtes pas associé à une entreprise.
+            Vous n'êtes pas associé à une entreprise.
           </div>
         ) : rooms.length === 0 ? (
           <p>Aucune salle pour votre entreprise.</p>
         ) : (
           <ul className='grid md:grid-cols-3 gap-4'>
             {rooms.map((room) => (
-              <li key={room.id} className='flex flex-col border border-base-300 p-5 rounded-2xl'>
+              <li key={room.id} className='flex flex-col border-base-300 border p-5 rounded-2xl'>
                 <Image
                   src={room.imgUrl || '/placeholder.jpg'}
                   alt={room.name}
@@ -149,7 +142,7 @@ const Page = () => {
 
                   <Link className='btn btn-secondary btn-outline btn-sm mt-2' href={`/reservations/${room.id}`}>
                     <SquareArrowOutUpRight className='w-4' />
-                    Réserver
+                    Reserver
                   </Link>
                 </div>
               </li>

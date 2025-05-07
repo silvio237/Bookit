@@ -38,6 +38,7 @@ const Page = ({ params }: { params: { roomId: string } }) => {
     setSelectedDate(formatedDate)
   }, [])
 
+
   const [notification, setNotification] = useState<string>('')
   const closeNotification = () => {
     setNotification("")
@@ -80,6 +81,7 @@ const Page = ({ params }: { params: { roomId: string } }) => {
     return hours * 60 + minutes
   }
 
+
   const formatTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60)
     const mins = minutes % 60
@@ -102,7 +104,9 @@ const Page = ({ params }: { params: { roomId: string } }) => {
         const slotStart = formatTime(time)
         const slotEnd = formatTime(time + 30)
 
+
         const istoday = selectedDateObj.toDateString() === today.toDateString();
+
         const isPastSlot = istoday && time < now
 
         const isReserved = reservations.some(({ startTime, endTime }) =>
@@ -118,12 +122,16 @@ const Page = ({ params }: { params: { roomId: string } }) => {
     setAvailableSlots(slots)
   }
 
+  console.log(availableSlots)
+
   const isSlotSelected = (slot: string) => {
     return selectedSlots.includes(slot);
   }
 
   const handleSlotClick = (slot: string) => {
     let updatedSlots: string[]
+
+    console.log(slot)
 
     if (selectedSlots.includes(slot)) {
       updatedSlots = selectedSlots.filter((s) => s !== slot)
@@ -179,18 +187,20 @@ const Page = ({ params }: { params: { roomId: string } }) => {
       if (response.ok) {
         setNotification('Réservation réussie !')
         fetchRoomData()
-        setSelectedSlots([]) // Reset selected slots after successful reservation
-        setMergedSlots([])   // Reset merged slots
+        setSelectedSlots([])
+        setMergedSlots([])
       } else {
         console.error('Erreur lors de la réservation.');
       }
     } catch (error) {
       console.error(error)
     }
+
   }
 
   return (
     <Wrapper>
+
       {notification && (
         <Notification message={notification} onclose={closeNotification}></Notification>
       )}
@@ -200,6 +210,7 @@ const Page = ({ params }: { params: { roomId: string } }) => {
         {roomData && (
           <div className='flex'>
             <div className="w-full h-fit">
+
               {mergedSlots.length > 0 && (
                 <ul className='hidden md:flex flex-wrap gap-1 mb-4 items-center'>
                   Créneaux choisis :
@@ -216,7 +227,8 @@ const Page = ({ params }: { params: { roomId: string } }) => {
                     height={400}
                     quality={100}
                     className='shadow-sm w-full  h-48 object-cover rounded-xl'
-                  />
+                  >
+                  </Image>
 
                   <div className='flex items-center mt-4'>
                     <div className='badge badge-secondary'>
@@ -233,8 +245,8 @@ const Page = ({ params }: { params: { roomId: string } }) => {
                   </p>
 
                   <button className="btn btn-outline mt-4 btn-sm btn-secondary md:hidden block" onClick={() => (document.getElementById('my_modal') as HTMLDialogElement).showModal()}>Choisir un créneau</button>
-                </div>
 
+                </div>
                 <div className='hidden md:block ml-4 w-2/3 '>
                   <div className='flex'>
                     <input
@@ -258,9 +270,8 @@ const Page = ({ params }: { params: { roomId: string } }) => {
 
                   <ul className='grid grid-cols-2 gap-4 mt-4'>
                     {availableSlots.length > 0 ? (
-                      availableSlots.map((slot) => (
+                      availableSlots.map((slot, index) => (
                         <button
-                          key={slot} // Ajout de la clé unique
                           className={`btn w-full btn-md ${isSlotSelected(slot) ? 'btn-secondary' : 'btn-outline btn-ghost border border-base-300 text-gray-500 hover:bg-secondary hover:border-secondary'} `}
                           onClick={() => handleSlotClick(slot)}
                         >
@@ -271,16 +282,22 @@ const Page = ({ params }: { params: { roomId: string } }) => {
                       <p className=''>Aucun créneau disponible.</p>
                     )}
                   </ul>
+
                 </div>
               </div>
+
             </div>
+
+
 
             <dialog id="my_modal" className="modal">
               <div className="modal-box">
                 <form method="dialog">
+                  {/* if there is a button in form, it will close the modal */}
                   <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                 </form>
-                <div className='w-full mt-5'>
+                <div className='w-full mt-5 '>
+
                   {mergedSlots.length > 0 && (
                     <ul className='flex flex-wrap gap-1 mb-4 items-center'>
                       Créneaux choisis :
@@ -311,9 +328,8 @@ const Page = ({ params }: { params: { roomId: string } }) => {
 
                   <ul className='grid grid-cols-2 gap-4 mt-4'>
                     {availableSlots.length > 0 ? (
-                      availableSlots.map((slot) => (
+                      availableSlots.map((slot, index) => (
                         <button
-                          key={slot} // Ajout de la clé unique
                           className={`btn w-full btn-md ${isSlotSelected(slot) ? 'btn-secondary' : 'btn-outline btn-ghost border border-base-300 text-gray-500 hover:bg-secondary hover:border-secondary'} `}
                           onClick={() => handleSlotClick(slot)}
                         >
@@ -324,6 +340,7 @@ const Page = ({ params }: { params: { roomId: string } }) => {
                       <p className=''>Aucun créneau disponible.</p>
                     )}
                   </ul>
+
                 </div>
               </div>
             </dialog>
