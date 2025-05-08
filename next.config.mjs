@@ -11,6 +11,19 @@ const nextConfig = {
     // ⚠️ Ignore les erreurs ESLint au build
     ignoreDuringBuilds: true,
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)', // Applique cette règle à toutes les routes
+        headers: [
+          {
+            key: 'Set-Cookie',
+            value: 'Secure; SameSite=None; Path=/; HttpOnly', // Définition des cookies sécurisés
+          },
+        ],
+      },
+    ]
+  },
 }
 
 export default nextConfig
