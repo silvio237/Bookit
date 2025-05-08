@@ -13,4 +13,4 @@ export const config = {
   ],
 };
 
-export default withAuth // Appel correct du middleware withAuth
+export default withAuth// Appel correct du middleware withAuth

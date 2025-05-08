@@ -4,22 +4,14 @@ import React, { useEffect, useState } from 'react'
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import Wrapper from '../components/Wrapper';
 import Image from 'next/image';
-import { SquareArrowOutUpRight, Users } from 'lucide-react';
+import {SquareArrowOutUpRight, Users } from 'lucide-react';
 import Link from 'next/link';
-
-type Room = {
-  id: string;
-  name: string;
-  description: string;
-  imgUrl?: string;
-  capacity: number;
-};
 
 const Page = () => {
   const { user } = useKindeBrowserClient();
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<any[]>([]);
   const [companyName, setCompanyName] = useState('');
 
   const cleanupExpiredReservations = async () => {
@@ -115,7 +107,7 @@ const Page = () => {
 
         {!companyId ? (
           <div>
-            Vous n&apos;êtes pas associé à une entreprise.
+            Vous n'êtes pas associé à une entreprise.
           </div>
         ) : rooms.length === 0 ? (
           <p>Aucune salle pour votre entreprise.</p>
