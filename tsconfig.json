@@ -10,8 +10,8 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",  // Change "bundler" à "node"
+    "module": "Node16",
+    "moduleResolution": "Node16",  // Change "bundler" à "node"
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
