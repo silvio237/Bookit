@@ -33,7 +33,7 @@ export async function POST(request: Request) {
                 const [startTime, endTime] = slot.split(' - ');
                 return prisma.reservation.create({
                     data: {
-                        userId: user.id,  // Pas de déclaration de `userId` explicite ici
+                        userId: user.id,
                         roomId,
                         reservationDate,
                         startTime,
@@ -42,8 +42,8 @@ export async function POST(request: Request) {
                 });
             })
         );
-        return NextResponse.json({ reservations }, { status: 201 });
 
+        return NextResponse.json({ reservations }, { status: 201 });
     } catch (error) {
         console.error('Error in API:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
         const email = searchParams.get('email');
 
         if (!email) {
-            return NextResponse.json({ message: "email manquant" }, { status: 400 });
+            return NextResponse.json({ message: 'Email manquant' }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({
@@ -74,13 +74,14 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: 'Utilisateur non trouvé' }, { status: 404 });
         }
 
-        const reservationWithoutUserId = user.reservations.map(res => {
-            const { userId, ...rest } = res;
-            return rest;
+        // ⚠️ Version alternative sans utiliser 'userId' dans la déstructuration
+        const reservationWithoutUserId = user.reservations.map((reservation) => {
+            const copy = { ...reservation } as { [key: string]: any };
+            delete copy.userId;
+            return copy;
         });
 
         return NextResponse.json({ reservationWithoutUserId }, { status: 200 });
-
     } catch (error) {
         console.error('Error in API:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -100,7 +101,6 @@ export async function DELETE(request: Request) {
         });
 
         return NextResponse.json({ message: 'Réservation supprimée avec succès', deletedReservation });
-
     } catch (error) {
         console.error('Error in API:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
