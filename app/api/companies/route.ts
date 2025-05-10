@@ -113,16 +113,19 @@ export async function PATCH(request: Request) {
   try {
     const { id, creatorEmail, employeeEmail, action } = await request.json();
 
+    // Vérifier si le créateur existe
     const creator = await prisma.user.findUnique({ where: { email: creatorEmail } });
     if (!creator) {
       return NextResponse.json({ message: 'Créateur non trouvé' }, { status: 404 });
     }
 
+    // Vérifier si l'entreprise existe
     const company = await prisma.company.findUnique({ where: { id } });
     if (!company) {
       return NextResponse.json({ message: 'Entreprise non trouvée' }, { status: 404 });
     }
 
+    // Vérifier si le créateur est bien l'utilisateur ayant créé l'entreprise
     if (company.createdById !== creator.id) {
       return NextResponse.json(
         { message: 'L\'utilisateur n\'est pas le créateur de l\'entreprise' },
@@ -130,6 +133,7 @@ export async function PATCH(request: Request) {
       );
     }
 
+    // Si l'action est d'ajouter un employé
     if (action === 'ADD') {
       let employee = await prisma.user.findUnique({ where: { email: employeeEmail } });
 
@@ -148,16 +152,19 @@ export async function PATCH(request: Request) {
       }
 
       if (!employee) {
+        // Créer un nouvel employé
         employee = await prisma.user.create({
           data: { email: employeeEmail, companyId: company.id },
         });
       } else {
+        // Mettre à jour un employé existant
         await prisma.user.update({
           where: { id: employee.id },
           data: { companyId: company.id },
         });
       }
 
+      // Ajouter l'employé à l'entreprise
       await prisma.company.update({
         where: { id: company.id },
         data: {
@@ -168,11 +175,13 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ message: 'Employé ajouté avec succès' }, { status: 201 });
 
     } else if (action === 'DELETE') {
+      // Si l'action est de supprimer un employé
       const employee = await prisma.user.findUnique({ where: { email: employeeEmail } });
       if (!employee) {
         return NextResponse.json({ message: 'Employé non trouvé' }, { status: 404 });
       }
 
+      // Retirer l'employé de l'entreprise
       await prisma.company.update({
         where: { id: company.id },
         data: {
