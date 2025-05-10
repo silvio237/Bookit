@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import Wrapper from '../components/Wrapper';
 import Image from 'next/image';
-import {SquareArrowOutUpRight, Users } from 'lucide-react';
+import { SquareArrowOutUpRight, Users } from 'lucide-react';
 import Link from 'next/link';
 
 const Page = () => {
@@ -24,7 +24,6 @@ const Page = () => {
     }
   };
 
-  // Étape 1 - Dès que l'utilisateur est dispo, on récupère son entreprise
   useEffect(() => {
     const fetchCompanyId = async () => {
       if (user) {
@@ -40,10 +39,9 @@ const Page = () => {
           });
 
           const data = await response.json();
-          setCompanyId(data.companyId || null);
+          setCompanyId(data.companyId || null); // Pas bloquant
         } catch (error) {
           console.error('Erreur fetchCompanyId:', error);
-          setCompanyId(null);
         } finally {
           setLoading(false);
         }
@@ -53,37 +51,36 @@ const Page = () => {
     fetchCompanyId();
   }, [user]);
 
-  // Étape 2 - Dès qu'on a le companyId, on récupère les salles
   useEffect(() => {
     const fetchRooms = async () => {
-      if (companyId) {
-        setLoading(true);
-        try {
-          const response = await fetch(`/api/rooms?companyId=${companyId}`);
-          if (!response.ok) {
-            throw new Error('Erreur lors de la récupération des salles.');
-          }
+      setLoading(true);
+      try {
+        const url = companyId
+          ? `/api/rooms?companyId=${companyId}`
+          : `/api/rooms`; // <-- Si pas de company, récupère tout
 
-          const data = await response.json();
-          setRooms(data.rooms);
-          setCompanyName(data.companyName);
-        } catch (error) {
-          console.error('Erreur fetchRooms:', error);
-        } finally {
-          setLoading(false);
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des salles.');
         }
+
+        const data = await response.json();
+        setRooms(data.rooms);
+        setCompanyName(data.companyName || '');
+      } catch (error) {
+        console.error('Erreur fetchRooms:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchRooms();
   }, [companyId]);
 
-  // Nettoyage des réservations expirées au premier rendu
   useEffect(() => {
     cleanupExpiredReservations();
   }, []);
 
-  // Affichage
   if (loading) {
     return (
       <Wrapper>
@@ -97,20 +94,20 @@ const Page = () => {
   return (
     <Wrapper>
       <div>
-        {companyName && (
+        {companyName ? (
           <div className="badge badge-secondary badge-outline">
             {companyName}
+          </div>
+        ) : (
+          <div className="text-sm text-gray-500 mb-4">
+            Vous n’êtes pas encore rattaché à une entreprise, mais vous pouvez tout de même réserver une salle.
           </div>
         )}
 
         <h1 className='text-2xl mb-4'>Réserver une salle</h1>
 
-        {!companyId ? (
-          <div>
-            Vous n'êtes pas associé à une entreprise.
-          </div>
-        ) : rooms.length === 0 ? (
-          <p>Aucune salle pour votre entreprise.</p>
+        {rooms.length === 0 ? (
+          <p>Aucune salle disponible.</p>
         ) : (
           <ul className='grid md:grid-cols-3 gap-4'>
             {rooms.map((room) => (
@@ -142,7 +139,7 @@ const Page = () => {
 
                   <Link className='btn btn-secondary btn-outline btn-sm mt-2' href={`/reservations/${room.id}`}>
                     <SquareArrowOutUpRight className='w-4' />
-                    Reserver
+                    Réserver
                   </Link>
                 </div>
               </li>
