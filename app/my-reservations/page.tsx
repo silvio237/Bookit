@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Wrapper from '../components/Wrapper';
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import Image from 'next/image';
@@ -31,7 +31,8 @@ const Page = () => {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchReservations = async () => {
+    // Utilisation de useCallback pour éviter la redéfinition de la fonction à chaque rendu
+    const fetchReservations = useCallback(async () => {
         if (!user?.email) return;
 
         try {
@@ -52,7 +53,7 @@ const Page = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user?.email]); // Ajout de user?.email comme dépendance
 
     const cleanupExpiredReservations = async () => {
         try {
@@ -85,7 +86,7 @@ const Page = () => {
             fetchReservations();
             cleanupExpiredReservations();
         }
-    }, [user?.email]); // plus précis que juste [user]
+    }, [user?.email, fetchReservations]); // Ajout de fetchReservations dans les dépendances
 
     return (
         <Wrapper>
