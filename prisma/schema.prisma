@@ -1,13 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
+    output   = "./node_modules/@prisma/client"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -17,18 +15,18 @@ model User {
   givenName        String?
   email            String        @unique
   companyId        String?
-  company          Company?      @relation("CompanyEmployees", fields: [companyId], references: [id])
   createdCompanies Company[]     @relation("CompanyCreators")
   reservations     Reservation[]
+  company          Company?      @relation("CompanyEmployees", fields: [companyId], references: [id])
 }
 
 model Company {
   id          String @id @default(cuid())
   name        String @unique
-  employees   User[] @relation("CompanyEmployees")
   createdById String
-  rooms       Room[]
   createdBy   User   @relation("CompanyCreators", fields: [createdById], references: [id])
+  rooms       Room[]
+  employees   User[] @relation("CompanyEmployees")
 }
 
 model Room {
@@ -38,19 +36,19 @@ model Room {
   description  String?
   imgUrl       String?
   companyId    String
-  company      Company       @relation(fields: [companyId], references: [id])
   reservations Reservation[]
+  company      Company       @relation(fields: [companyId], references: [id])
 }
 
 model Reservation {
   id              String @id @default(cuid())
   userId          String
-  user            User   @relation(fields: [userId], references: [id])
   roomId          String
-  room            Room   @relation(fields: [roomId], references: [id])
   reservationDate String
   startTime       String
   endTime         String
+  room            Room   @relation(fields: [roomId], references: [id])
+  user            User   @relation(fields: [userId], references: [id])
 
   @@unique([roomId, reservationDate, startTime])
 }

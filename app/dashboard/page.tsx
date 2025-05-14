@@ -106,7 +106,7 @@ const Page = () => {
           <div className="badge badge-secondary badge-outline">{companyName}</div>
         ) : (
           <div className="text-sm text-gray-500 mb-4">
-            Vous n’êtes pas encore rattaché à une entreprise, mais vous pouvez tout de même réserver une salle.
+            Vous n’êtes pas encore rattaché à une entreprise. Seul les employés de l'entreprise peuvent reservés des salles.
           </div>
         )}
 
