@@ -49,16 +49,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ✅ Image responsive fix */}
       <div className="flex justify-center items-center">
-        <div className="p-5 md:p-0">
-          <div className="relative rounded-xl bg-gray-900/5 p-2 ring-1 ring-gray-900/10 lg:rounded-2xl lg:p-4 w-full md:w-[1200px] md:h-[990px]">
+        <div className="p-5 md:p-0 w-full max-w-[1200px]">
+          <div className="relative h-[60vh] md:h-[990px] rounded-xl bg-gray-900/5 p-2 ring-1 ring-gray-900/10 lg:rounded-2xl lg:p-4">
             <Image
               src="/img.png"
-              alt="Aperçu de l&apos;app"
-              width={1600}
-              height={500}
+              alt="Aperçu de l'app"
+              fill
+              sizes="(max-width: 768px) 100vw, 1200px"
               quality={100}
-              className=" rounded-md shadow-2xl ring-1 ring-gray-900/10 object-cover filter contra saturate-100 w-full h-full"
+              className="rounded-md shadow-2xl ring-1 ring-gray-900/10 object-cover"
             />
           </div>
         </div>
