@@ -49,7 +49,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ✅ Image responsive fix */}
+      {/*  Image responsive fix */}
       <div className="flex justify-center items-center">
         <div className="p-5 md:p-0 w-full max-w-[1200px]">
           <div className="relative h-[60vh] md:h-[990px] rounded-xl bg-gray-900/5 p-2 ring-1 ring-gray-900/10 lg:rounded-2xl lg:p-4">
